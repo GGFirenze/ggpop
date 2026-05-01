@@ -1574,15 +1574,19 @@
             window.amplitude.init('af266e62320cf461d86cb154929ae006', {
                 autocapture: {
                     pageViews: false,
-                    sessions: true,
+                    sessions: false,
                     elementInteractions: false,
-                    attribution: true
+                    attribution: true,
+                    frustrationInteractions: true,
+                    webVitals: true
                 },
                 defaultTracking: {
                     pageViews: false,
-                    sessions: true,
+                    sessions: false,
                     formInteractions: false,
-                    attribution: true
+                    attribution: true,
+                    frustrationInteractions: true,
+                    webVitals: true
                 }
             });
 
