@@ -7,7 +7,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
     
     <!-- Amplitude Browser SDK -->
-    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.36.5-min.js.gz"></script>
+    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.42.0-min.js.gz"></script>
     <!-- Amplitude Guides & Surveys Plugin -->
     <script src="https://cdn.amplitude.com/libs/engagement-browser-1.0.9-min.js.gz"></script>
     
@@ -1572,15 +1572,19 @@
             window.amplitude.init('af266e62320cf461d86cb154929ae006', {
                 autocapture: {
                     pageViews: false,
-                    sessions: true,
+                    sessions: false,
                     elementInteractions: false,
-                    attribution: true
+                    attribution: true,
+                    frustrationInteractions: true,
+                    webVitals: true
                 },
                 defaultTracking: {
                     pageViews: false,
-                    sessions: true,
+                    sessions: false,
                     formInteractions: false,
-                    attribution: true
+                    attribution: true,
+                    frustrationInteractions: true,
+                    webVitals: true
                 }
             });
 
