@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GGpop - Buy and sell reused products</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+    
+    <!-- Amplitude Browser SDK -->
+    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.36.5-min.js.gz"></script>
+    <!-- Amplitude Guides & Surveys Plugin -->
+    <script src="https://cdn.amplitude.com/libs/engagement-browser-1.0.9-min.js.gz"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        /* Blur effect for cookie consent */
+        body.consent-pending .main-content {
+            filter: blur(3px);
+            pointer-events: none;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #13c5a3;
+            text-decoration: none;
+            margin-right: 24px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #13c5a3;
+            border-radius: 50%;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin-right: 24px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            font-size: 16px;
+            background: #f8f9fa;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        .btn-outline:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-primary {
+            background: #13c5a3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #10a085;
+        }
+
+        /* Category Navigation */
+        .category-nav {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 12px 24px;
+            display: flex;
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .category-nav a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .category-nav a:hover,
+        .category-nav a.active {
+            color: #13c5a3;
+            border-bottom-color: #13c5a3;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 140px;
+            transition: filter 0.3s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #b8e6b8 0%, #13c5a3 100%);
+            padding: 80px 24px;
+            margin-bottom: 60px;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2c5f41;
+            line-height: 1.2;
+            margin-bottom: 32px;
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+
+        /* Product Categories */
+        .categories-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .category-tile {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-tile:hover {
+            transform: translateY(-4px);
+        }
+
+        .category-tile img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .category-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .category-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Lifestyle Categories */
+        .lifestyle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .lifestyle-tile {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .lifestyle-tile:hover {
+            transform: translateY(-2px);
+        }
+
+        .lifestyle-tile img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .lifestyle-info {
+            padding: 16px;
+            text-align: center;
+        }
+
+        .lifestyle-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* App Download Banner */
+        .app-banner {
+            background: #13c5a3;
+            color: white;
+            text-align: center;
+            padding: 60px 24px;
+            margin: 60px 0;
+        }
+
+        .app-banner h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 8px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 60px 24px 40px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .cities-section h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .cities-text {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .about-section {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h4 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .footer-column a {
+            display: block;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 8px;
+        }
+
+        .footer-column a:hover {
+            color: #13c5a3;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-stores {
+            display: flex;
+            gap: 20px;
+        }
+
+        .app-store-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* Cookie Consent Banner */
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+            z-index: 200;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .cookie-banner.visible {
+            transform: translateY(0);
+        }
+
+        .cookie-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .cookie-text h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .cookie-text p {
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .cookie-links {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .cookie-links a {
+            color: #13c5a3;
+            text-decoration: none;
+        }
+
+        .data-processing h4 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .data-processing p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .cookie-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .cookie-actions .btn {
+            flex: 1;
+        }
+
+        .btn-accept {
+            background: #13c5a3;
+            color: white;
+        }
+
+        .btn-reject {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        .btn-configure {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        /* Product Listing Page Styles */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .product-listing {
+            display: flex;
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .filters-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .filter-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .filter-categories {
+            list-style: none;
+        }
+
+        .filter-categories li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .filter-categories li:last-child {
+            border-bottom: none;
+        }
+
+        .filter-categories a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .filter-categories a:hover,
+        .filter-categories a.active {
+            color: #13c5a3;
+        }
+
+        .view-all-link {
+            color: #13c5a3;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 16px;
+        }
+
+        .location-info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .change-location {
+            color: #13c5a3;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #13c5a3;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            right: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .radio-item input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #13c5a3;
+        }
+
+        .radio-item label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .products-content {
+            flex: 1;
+        }
+
+        .products-header {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .products-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .search-results-info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .sort-dropdown {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .product-image {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #13c5a3;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .product-badge.highlighted {
+            background: #ff6b35;
+        }
+
+        .product-favorite {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #ccc;
+            transition: all 0.3s ease;
+        }
+
+        .product-favorite:hover {
+            color: #ff4757;
+        }
+
+        .product-favorite.active {
+            color: #ff4757;
+        }
+
+        .product-info {
+            padding: 16px;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-shipping {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #13c5a3;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .product-shipping.person-only {
+            color: #666;
+        }
+
+        .load-more-container {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .btn-load-more {
+            background: #13c5a3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-load-more:hover {
+            background: #10a085;
+        }
+
+        /* Search box update for product page */
+        .search-box.product-search {
+            background: white;
+        }
+
+        /* Hide/show sections based on current page */
+        .homepage-content .hero,
+        .homepage-content .categories-section,
+        .homepage-content .app-banner {
+            display: block;
+        }
+
+        .product-page-content .hero,
+        .product-page-content .categories-section,
+        .product-page-content .app-banner {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 12px;
+            }
+
+            .hero-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .cookie-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .footer-links {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .product-listing {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .filters-sidebar {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body class="consent-pending">
+    <!-- Header -->
+    <header class="header">
+        <nav class="top-nav">
+            <a href="#" class="logo" data-nav="logo">
+                <div class="logo-icon">W</div>
+                GGpop
+            </a>
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Search for Nintendo">
+            </div>
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-outline" data-nav="register">Register or sign in</a>
+                <a href="#" class="btn btn-primary" data-nav="sell">+ Sell</a>
+            </div>
+        </nav>
+        <nav class="category-nav">
+            <a href="#" class="active" data-nav="all-categories">📋 All categories</a>
+            <a href="#" data-nav="cars">Cars</a>
+            <a href="#" data-nav="motorbike">Motorbike</a>
+            <a href="#" data-nav="motors-accessories">Motors & accessories</a>
+            <a href="#" data-nav="fashion-accessories">Fashion & accessories</a>
+            <a href="#" data-nav="real-estate">Real Estate</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Homepage -->
+        <div class="page homepage-content active">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1>Buy and sell reused products<br>without getting<br>off the couch.</h1>
+                    <a href="#" class="btn btn-primary" style="font-size: 18px; padding: 16px 32px;">+ Sell now</a>
+                </div>
+                <div class="hero-image">
+                    <div style="width: 400px; height: 300px; background: linear-gradient(45deg, #13c5a3, #2c5f41); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                        📱 Hero Image
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Categories -->
+        <section class="categories-section">
+            <h2 class="section-title">The technology you need</h2>
+            <div class="categories-grid">
+                <div class="category-tile" data-category="iPad">
+                    <div style="width: 100%; height: 200px; background: linear-gradient(45deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">📱</div>
+                    <div class="category-info">
+                        <div class="category-name">iPad</div>
+                    </div>
+                </div>
+                <div class="category-tile" data-category="Tablet">
+                    <div style="width: 100%; height: 200px; background: linear-gradient(45deg, #f093fb, #f5576c); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">💻</div>
+                    <div class="category-info">
+                        <div class="category-name">Tablet</div>
+                    </div>
+                </div>
+                <div class="category-tile" data-category="Headphones">
+                    <div style="width: 100%; height: 200px; background: linear-gradient(45deg, #4facfe, #00f2fe); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">🎧</div>
+                    <div class="category-info">
+                        <div class="category-name">Headphones</div>
+                    </div>
+                </div>
+                <div class="category-tile" data-category="Laptop">
+                    <div style="width: 100%; height: 200px; background: linear-gradient(45deg, #43e97b, #38f9d7); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">💻</div>
+                    <div class="category-info">
+                        <div class="category-name">Laptop</div>
+                    </div>
+                </div>
+                <div class="category-tile" data-category="Desktop">
+                    <div style="width: 100%; height: 200px; background: linear-gradient(45deg, #fa709a, #fee140); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">🖥️</div>
+                    <div class="category-info">
+                        <div class="category-name">Desktop</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Back to routine</h2>
+            <div class="lifestyle-grid">
+                <div class="lifestyle-tile" data-category="Stationary bicycle">
+                    <div style="width: 100%; height: 160px; background: linear-gradient(45deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">🚴‍♀️</div>
+                    <div class="lifestyle-info">
+                        <div class="lifestyle-name">Stationary bicycle</div>
+                    </div>
+                </div>
+                <div class="lifestyle-tile" data-category="Street bike">
+                    <div style="width: 100%; height: 160px; background: linear-gradient(45deg, #f093fb, #f5576c); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">🚲</div>
+                    <div class="lifestyle-info">
+                        <div class="lifestyle-name">Street bike</div>
+                    </div>
+                </div>
+                <div class="lifestyle-tile" data-category="Mountain bike">
+                    <div style="width: 100%; height: 160px; background: linear-gradient(45deg, #4facfe, #00f2fe); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">🚵‍♂️</div>
+                    <div class="lifestyle-info">
+                        <div class="lifestyle-name">Mountain bike</div>
+                    </div>
+                </div>
+                <div class="lifestyle-tile" data-category="Walking Pad">
+                    <div style="width: 100%; height: 160px; background: linear-gradient(45deg, #43e97b, #38f9d7); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">🏃‍♂️</div>
+                    <div class="lifestyle-info">
+                        <div class="lifestyle-name">Walking Pad</div>
+                    </div>
+                </div>
+                <div class="lifestyle-tile" data-category="Handlebars">
+                    <div style="width: 100%; height: 160px; background: linear-gradient(45deg, #fa709a, #fee140); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">🏋️‍♀️</div>
+                    <div class="lifestyle-info">
+                        <div class="lifestyle-name">Handlebars</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- App Download Banner -->
+        <section class="app-banner">
+            <h2>Want the app? Download it now</h2>
+            <div class="qr-code">📱</div>
+            <p>4.8 ⭐ AppStore &nbsp;&nbsp;&nbsp; 4.7 ⭐ PlayStore</p>
+            <p>Based on more than 10,000 reviews</p>
+        </section>
+        </div>
+
+        <!-- Product Listing Page (dynamically populated) -->
+        <div class="page product-page-content">
+            <div class="product-listing">
+                <aside class="filters-sidebar">
+                    <div class="filter-section">
+                        <h3>Filters</h3>
+                        <ul class="filter-categories" id="filterCategories"></ul>
+                        <a href="#" class="view-all-link">View all</a>
+                    </div>
+
+                    <div class="filter-section" id="filterSubcategories" style="display:none;">
+                        <h3 id="subcategoryTitle">Subcategories</h3>
+                        <ul class="filter-categories" id="subcategoryList"></ul>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3>Location</h3>
+                        <p class="location-info">Any location</p>
+                        <a href="#" class="change-location">Change</a>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="toggle-switch">
+                            <span>Shipping options</span>
+                            <div class="toggle"></div>
+                        </div>
+                        <p style="color: #666; font-size: 14px; margin-top: 8px;">Shipping</p>
+                    </div>
+
+                    <div class="filter-section" id="filterPrice">
+                        <h3>Price range</h3>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="price_range" id="price_any" value="any" checked>
+                                <label for="price_any">Any price</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="price_range" id="price_low" value="low">
+                                <label for="price_low" id="priceLowLabel">Under 100 €</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="price_range" id="price_mid" value="mid">
+                                <label for="price_mid" id="priceMidLabel">100 - 500 €</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="price_range" id="price_high" value="high">
+                                <label for="price_high" id="priceHighLabel">Over 500 €</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3>Listing date</h3>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="listing_date" id="today" value="today">
+                                <label for="today">Today</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="listing_date" id="last_week" value="last_week">
+                                <label for="last_week">Last week</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="listing_date" id="last_month" value="last_month">
+                                <label for="last_month">Last month</label>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="products-content">
+                    <div class="products-header">
+                        <h2 id="listingTitle">Find what you want</h2>
+                        <p class="search-results-info" id="resultsCount">Search results</p>
+                        <div class="sort-dropdown">
+                            <span>Sort by: Distance</span>
+                            <span>▼</span>
+                        </div>
+                    </div>
+
+                    <div class="products-grid" id="productsGrid"></div>
+
+                    <div class="load-more-container">
+                        <button class="btn-load-more">Load more</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="cities-section">
+                    <h3>Cities</h3>
+                    <p class="cities-text">
+                        London, Leicester, Manchester, Bristol, Birmingham, Edinburgh, Glasgow, Liverpool, 
+                        Brighton, Nottingham, Leeds, Salford, Oxford, Cardiff
+                    </p>
+                </div>
+                <div class="about-section">
+                    <h3>GGpop and second-hand</h3>
+                    <p>
+                        "If you don't use it, list it." That's the premise under which GGpop has grown into a community where millions of people buy and 
+                        sell second-hand items every day. And we're only just getting started. Buying second-hand isn't just the best way to get what you 
+                        need for a better price. Every time you buy something on GGpop, you promote more sustainable consumption because you extend 
+                        the useful life of items and turn away from overproduction.
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>GGpop</h4>
+                    <a href="#">About us</a>
+                    <a href="#">Press</a>
+                    <a href="#">Jobs</a>
+                    <a href="#">Sustainability</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Support</h4>
+                    <a href="#">Help Center</a>
+                    <a href="#">Community guidelines</a>
+                    <a href="#">Security tips</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <a href="#">Legal notice</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Cookies policy</a>
+                </div>
+                <div class="footer-column">
+                    <h4>GGpop PRO</h4>
+                    <a href="#">Multicategory</a>
+                    <a href="#">Cars</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2015-2025 GGpop. All right reserved</p>
+                <div class="app-stores">
+                    <a href="#" class="app-store-btn">🍎 Apple Store</a>
+                    <a href="#" class="app-store-btn">📱 AppGallery</a>
+                    <a href="#" class="app-store-btn">🤖 Google Play</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner visible">
+        <div class="cookie-content">
+            <div>
+                <div class="cookie-text">
+                    <h3>Privacy stuff? You choose</h3>
+                    <p>
+                        Here at GGpop, we and our <strong>941</strong> partners store and process cookies and your data to improve and keep all GGpop 
+                        services secure, adapt and measure advertising, content and communication. You may accept or manage your choices by 
+                        clicking below, including your right to object where legitimate interest is used, or at any time in the privacy policy page. 
+                        These choices will be signaled to our partners and will not affect browsing data.
+                    </p>
+                    <div class="cookie-links">
+                        <a href="#">Cookies policy</a>
+                        <a href="#">Privacy policy</a>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="data-processing">
+                    <h4>What do we process data for?</h4>
+                    <p>
+                        Use precise geolocation data. Actively scan device characteristics for identification. Store and/or access 
+                        information on a device. Personalised advertising and content, advertising and content measurement, audience 
+                        research and services development.
+                    </p>
+                    <a href="#" style="color: #13c5a3; text-decoration: none;">List of Partners (vendors)</a>
+                </div>
+                <div class="cookie-actions">
+                    <button class="btn btn-accept" onclick="acceptCookies()">Accept all</button>
+                    <button class="btn btn-reject" onclick="rejectCookies()">Reject all</button>
+                    <button class="btn btn-configure" onclick="configureCookies()">Configure</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let amplitudeInitialized = false;
+        let currentCategory = null;
+        let currentSearchTerm = null;
+
+        const gradients = [
+            'linear-gradient(45deg, #667eea, #764ba2)',
+            'linear-gradient(45deg, #f093fb, #f5576c)',
+            'linear-gradient(45deg, #4facfe, #00f2fe)',
+            'linear-gradient(45deg, #43e97b, #38f9d7)',
+            'linear-gradient(45deg, #fa709a, #fee140)',
+            'linear-gradient(45deg, #a18cd1, #fbc2eb)'
+        ];
+
+        const categoryData = {
+            cars: {
+                label: 'Cars',
+                icon: '🚗',
+                subcategories: ['Sedan', 'SUV', 'Hatchback', 'Convertible', 'Van', 'Electric'],
+                products: [
+                    { id: 'c1', name: 'Seat Ibiza 1.0 TSI Style', price: 8500, icon: '🚗', shipping: false },
+                    { id: 'c2', name: 'Volkswagen Golf 1.6 TDI', price: 12900, icon: '🚗', shipping: false },
+                    { id: 'c3', name: 'Renault Clio Zen 2019', price: 9200, icon: '🚗', shipping: false },
+                    { id: 'c4', name: 'Ford Focus Titanium 2020', price: 14500, icon: '🚗', shipping: false },
+                    { id: 'c5', name: 'Peugeot 208 Allure 1.2', price: 11800, icon: '🚗', shipping: false },
+                    { id: 'c6', name: 'Toyota Corolla Hybrid', price: 18200, icon: '🚗', badge: 'Top profile' },
+                    { id: 'c7', name: 'Opel Astra 1.4 Turbo', price: 10400, icon: '🚗', shipping: false },
+                    { id: 'c8', name: 'BMW Serie 1 116d', price: 16900, icon: '🚗', shipping: false },
+                    { id: 'c9', name: 'Citroën C3 PureTech Feel', price: 7800, icon: '🚗', shipping: false },
+                    { id: 'c10', name: 'Dacia Sandero Stepway', price: 6500, icon: '🚗', shipping: false },
+                    { id: 'c11', name: 'Hyundai i20 MPI Klass', price: 9900, icon: '🚗', shipping: false },
+                    { id: 'c12', name: 'Tesla Model 3 Standard', price: 28500, icon: '⚡', badge: 'Electric' }
+                ]
+            },
+            motorbike: {
+                label: 'Motorbike',
+                icon: '🏍️',
+                subcategories: ['Sport', 'Scooter', 'Naked', 'Trail', 'Custom', 'Classic'],
+                products: [
+                    { id: 'm1', name: 'Yamaha MT-07 2021', price: 5800, icon: '🏍️', shipping: false },
+                    { id: 'm2', name: 'Honda CB500F ABS', price: 4200, icon: '🏍️', shipping: false },
+                    { id: 'm3', name: 'Kawasaki Z650 2020', price: 5100, icon: '🏍️', shipping: false },
+                    { id: 'm4', name: 'Vespa Primavera 125', price: 2800, icon: '🛵', shipping: true },
+                    { id: 'm5', name: 'BMW R 1250 GS Adven...', price: 14500, icon: '🏍️', badge: 'Top profile' },
+                    { id: 'm6', name: 'Kymco Agility 125 City', price: 1200, icon: '🛵', shipping: true },
+                    { id: 'm7', name: 'Ducati Monster 821', price: 7900, icon: '🏍️', shipping: false },
+                    { id: 'm8', name: 'Piaggio Liberty 125', price: 1500, icon: '🛵', shipping: true },
+                    { id: 'm9', name: 'Triumph Street Triple R', price: 8200, icon: '🏍️', shipping: false },
+                    { id: 'm10', name: 'Honda PCX 125 2022', price: 2400, icon: '🛵', shipping: true },
+                    { id: 'm11', name: 'KTM Duke 390 2021', price: 4300, icon: '🏍️', shipping: false },
+                    { id: 'm12', name: 'Suzuki SV650 ABS', price: 4800, icon: '🏍️', shipping: false }
+                ]
+            },
+            'motors-accessories': {
+                label: 'Motors & accessories',
+                icon: '🔧',
+                subcategories: ['Tyres & rims', 'Car audio', 'GPS & electronics', 'Interior', 'Exterior', 'Spare parts'],
+                products: [
+                    { id: 'ma1', name: 'Michelin Pilot Sport 4 225/45R17', price: 95, icon: '🛞', shipping: true },
+                    { id: 'ma2', name: 'Pioneer SPH-DA160DAB', price: 280, icon: '📻', shipping: true },
+                    { id: 'ma3', name: 'Garmin DriveSmart 66 EU', price: 150, icon: '📍', shipping: true },
+                    { id: 'ma4', name: 'LED Light Bar 120W Off-Road', price: 45, icon: '💡', shipping: true },
+                    { id: 'ma5', name: 'Thule WingBar Evo Roof Rack', price: 180, icon: '📦', shipping: true },
+                    { id: 'ma6', name: 'Sparco R383 Steering Wheel', price: 220, icon: '🎯', badge: 'Top profile' },
+                    { id: 'ma7', name: 'Bosch Car Battery S4 60Ah', price: 85, icon: '🔋', shipping: true },
+                    { id: 'ma8', name: 'Kärcher OC 3 Portable Wash...', price: 120, icon: '💦', shipping: true },
+                    { id: 'ma9', name: 'NGK Iridium Spark Plug Set', price: 32, icon: '⚡', shipping: true },
+                    { id: 'ma10', name: 'Hella Xenon Headlight D2S', price: 65, icon: '💡', shipping: true },
+                    { id: 'ma11', name: 'Recaro Sportster CS Seat', price: 750, icon: '💺', shipping: true },
+                    { id: 'ma12', name: 'K&N Air Filter Universal', price: 40, icon: '🌀', shipping: true }
+                ]
+            },
+            'fashion-accessories': {
+                label: 'Fashion & accessories',
+                icon: '👗',
+                subcategories: ['Women\'s clothing', 'Men\'s clothing', 'Shoes', 'Bags', 'Jewellery', 'Watches'],
+                products: [
+                    { id: 'f1', name: 'Zara Wool Blend Coat - M', price: 35, icon: '🧥', shipping: true },
+                    { id: 'f2', name: 'Nike Air Max 90 White (42)', price: 65, icon: '👟', shipping: true },
+                    { id: 'f3', name: 'Louis Vuitton Neverfull MM', price: 850, icon: '👜', badge: 'Top profile' },
+                    { id: 'f4', name: 'Levi\'s 501 Original Jeans 32', price: 28, icon: '👖', shipping: true },
+                    { id: 'f5', name: 'Ray-Ban Aviator Classic Gold', price: 75, icon: '🕶️', shipping: true },
+                    { id: 'f6', name: 'Adidas Stan Smith (40)', price: 40, icon: '👟', shipping: true },
+                    { id: 'f7', name: 'Casio G-Shock GA-2100', price: 55, icon: '⌚', shipping: true },
+                    { id: 'f8', name: 'Pandora Silver Charm Brace...', price: 42, icon: '💎', shipping: true },
+                    { id: 'f9', name: 'The North Face Puffer Jacket', price: 90, icon: '🧥', shipping: true },
+                    { id: 'f10', name: 'Massimo Dutti Leather Belt', price: 18, icon: '👔', shipping: true },
+                    { id: 'f11', name: 'Michael Kors Crossbody Bag', price: 110, icon: '👜', shipping: true },
+                    { id: 'f12', name: 'Converse Chuck Taylor (38)', price: 25, icon: '👟', shipping: true }
+                ]
+            },
+            'real-estate': {
+                label: 'Real Estate',
+                icon: '🏠',
+                subcategories: ['Flat / Apartment', 'House', 'Studio', 'Room', 'Commercial', 'Garage'],
+                products: [
+                    { id: 'r1', name: '2-bed flat in Eixample, BCN', price: 245000, icon: '🏢', shipping: false },
+                    { id: 'r2', name: 'Studio in Malasaña, Madrid', price: 165000, icon: '🏠', shipping: false },
+                    { id: 'r3', name: '3-bed house in Valencia', price: 320000, icon: '🏡', shipping: false },
+                    { id: 'r4', name: 'Room in shared flat - Gracia', price: 450, icon: '🛏️', shipping: false, priceLabel: '450 €/month' },
+                    { id: 'r5', name: 'Penthouse in Diagonal Mar', price: 590000, icon: '🏢', badge: 'Featured' },
+                    { id: 'r6', name: 'Garage in Sarrià, Barcelona', price: 28000, icon: '🅿️', shipping: false },
+                    { id: 'r7', name: '1-bed flat near Retiro Park', price: 210000, icon: '🏢', shipping: false },
+                    { id: 'r8', name: 'Commercial space - Born', price: 185000, icon: '🏪', shipping: false },
+                    { id: 'r9', name: '4-bed villa in Sitges', price: 780000, icon: '🏡', shipping: false },
+                    { id: 'r10', name: 'Loft in Poblenou, Barcelona', price: 275000, icon: '🏠', shipping: false },
+                    { id: 'r11', name: 'Room near Univ. Barcelona', price: 380, icon: '🛏️', shipping: false, priceLabel: '380 €/month' },
+                    { id: 'r12', name: '2-bed flat in Gràcia, BCN', price: 298000, icon: '🏢', shipping: false }
+                ]
+            },
+            iPad: {
+                label: 'iPad',
+                icon: '📱',
+                subcategories: ['iPad Pro', 'iPad Air', 'iPad Mini', 'iPad Standard', 'Accessories'],
+                products: [
+                    { id: '1', name: 'iPad 10 Gen', price: 270, icon: '📱', shipping: true },
+                    { id: '2', name: 'Support multiple screens s...', price: 15, icon: '🖥️', shipping: true },
+                    { id: '3', name: 'iPad Pro (9.7 Inches - 2016...', price: 85, icon: '📱', shipping: true },
+                    { id: '4', name: 'iPad mini 5 (2019) 64 GB ...', price: 160, icon: '📱', shipping: true },
+                    { id: '5', name: 'Apple iPad', price: 400, icon: '📱', shipping: true },
+                    { id: '6', name: 'Apple iPad Pro (2024) 13 i...', price: 1200, icon: '📱', shipping: true },
+                    { id: '7', name: 'Apple Magic Keyboard iP...', price: 300, icon: '⌨️', shipping: true },
+                    { id: '8', name: 'Apple Pencil - Lápiz Blanco', price: 50, icon: '✏️', shipping: true },
+                    { id: '9', name: 'iPad 5 generación', price: 100, icon: '📱', shipping: false },
+                    { id: '10', name: 'Funda iPad Mini 6 Roja', price: 10, icon: '📱', shipping: true },
+                    { id: '11', name: 'iPad 7ª Gen 32gb', price: 160, icon: '📱', badge: 'Top profile' },
+                    { id: '12', name: 'iPad 2 16GB MD566/A - Ve...', price: 100, icon: '📱', shipping: true }
+                ]
+            }
+        };
+
+        const allCategoryKeys = ['cars', 'motorbike', 'motors-accessories', 'fashion-accessories', 'real-estate'];
+
+        function formatPrice(product) {
+            if (product.priceLabel) return product.priceLabel;
+            if (product.price >= 1000) {
+                return product.price.toLocaleString('de-DE') + ' €';
+            }
+            return product.price + ' €';
+        }
+
+        function renderProducts(categoryKey) {
+            currentCategory = categoryKey;
+            const cat = categoryData[categoryKey];
+            if (!cat) return;
+
+            const grid = document.getElementById('productsGrid');
+            const title = document.getElementById('listingTitle');
+            const count = document.getElementById('resultsCount');
+
+            title.textContent = cat.label;
+            count.textContent = cat.products.length + ' results';
+
+            grid.innerHTML = cat.products.map((p, i) => {
+                const grad = gradients[i % gradients.length];
+                const shippingHtml = p.shipping
+                    ? '<div class="product-shipping">📦 Shipping available</div>'
+                    : '<div class="product-shipping person-only">👤 Only sold in person</div>';
+                const badgeHtml = p.badge
+                    ? `<div class="product-badge${p.badge === 'Top profile' || p.badge === 'Featured' ? ' highlighted' : ''}">${p.badge}</div>`
+                    : '';
+
+                return `
+                <div class="product-card" data-product-id="${p.id}" data-product-name="${p.name}" data-product-category="${cat.label}" data-price="${p.price}" data-currency="EUR">
+                    ${badgeHtml}
+                    <div class="product-image" style="background: ${grad}; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">${p.icon}</div>
+                    <button class="product-favorite">♡</button>
+                    <div class="product-info">
+                        <div class="product-price">${formatPrice(p)}</div>
+                        <div class="product-title">${p.name}</div>
+                        ${shippingHtml}
+                    </div>
+                </div>`;
+            }).join('');
+
+            renderFilters(categoryKey);
+            renderSubcategories(categoryKey);
+            bindProductListeners();
+        }
+
+        function renderFilters(activeCategoryKey) {
+            const list = document.getElementById('filterCategories');
+            let html = '<li><a href="#" data-filter-cat="all-categories" class="active">All categories</a></li>';
+            allCategoryKeys.forEach(key => {
+                const cat = categoryData[key];
+                const isActive = key === activeCategoryKey ? ' class="active"' : '';
+                html += `<li><a href="#" data-filter-cat="${key}"${isActive}>${cat.label}</a></li>`;
+            });
+            html += '<li><a href="#" data-filter-cat="technology">Technology & electronics</a></li>';
+            list.innerHTML = html;
+
+            list.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const cat = this.getAttribute('data-filter-cat');
+                    trackEvent('Filter Applied', { filter_type: 'category', filter_value: this.textContent.trim() });
+                    if (cat === 'all-categories') {
+                        showPage('homepage');
+                    } else if (categoryData[cat]) {
+                        navigateToCategory(cat);
+                    }
+                });
+            });
+        }
+
+        function renderSubcategories(categoryKey) {
+            const cat = categoryData[categoryKey];
+            const section = document.getElementById('filterSubcategories');
+            const titleEl = document.getElementById('subcategoryTitle');
+            const list = document.getElementById('subcategoryList');
+
+            if (!cat || !cat.subcategories || cat.subcategories.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            titleEl.textContent = cat.label;
+            list.innerHTML = cat.subcategories.map(sub =>
+                `<li><a href="#" data-subcategory="${sub}">${sub}</a></li>`
+            ).join('');
+
+            list.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    list.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                    trackEvent('Filter Applied', {
+                        filter_type: 'subcategory',
+                        filter_value: this.textContent.trim(),
+                        parent_category: cat.label
+                    });
+                });
+            });
+        }
+
+        function bindProductListeners() {
+            document.querySelectorAll('.product-page-content .product-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('product-favorite')) return;
+                    const props = {
+                        product_name: this.getAttribute('data-product-name'),
+                        product_category: this.getAttribute('data-product-category'),
+                        price: parseInt(this.getAttribute('data-price')),
+                        currency: this.getAttribute('data-currency'),
+                        product_id: this.getAttribute('data-product-id'),
+                        page_type: currentSearchTerm ? 'search_results' : 'product_listing'
+                    };
+                    if (currentSearchTerm) props.search_term = currentSearchTerm;
+                    trackEvent('Product Clicked', props);
+                });
+            });
+
+            document.querySelectorAll('.product-page-content .product-favorite').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isActive = this.classList.toggle('active');
+                    this.textContent = isActive ? '♥' : '♡';
+                    const card = this.closest('.product-card');
+                    const props = {
+                        product_name: card.getAttribute('data-product-name'),
+                        product_id: card.getAttribute('data-product-id'),
+                        action: isActive ? 'added' : 'removed'
+                    };
+                    if (currentSearchTerm) props.search_term = currentSearchTerm;
+                    trackEvent('Product Favorited', props);
+                });
+            });
+        }
+
+        function performSearch(query) {
+            const term = query.toLowerCase();
+            const results = [];
+
+            Object.keys(categoryData).forEach(key => {
+                const cat = categoryData[key];
+                cat.products.forEach(p => {
+                    if (p.name.toLowerCase().includes(term) || cat.label.toLowerCase().includes(term)) {
+                        results.push({ ...p, categoryKey: key, categoryLabel: cat.label });
+                    }
+                });
+            });
+
+            renderSearchResults(query, results);
+        }
+
+        function renderSearchResults(query, results) {
+            currentCategory = null;
+            currentSearchTerm = query;
+
+            const grid = document.getElementById('productsGrid');
+            const title = document.getElementById('listingTitle');
+            const count = document.getElementById('resultsCount');
+
+            title.textContent = 'Results for "' + query + '"';
+            count.textContent = results.length + ' result' + (results.length !== 1 ? 's' : '') + ' found';
+
+            if (results.length === 0) {
+                trackEvent('Search No Results', {
+                    search_term: query
+                });
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                        <div style="font-size: 64px; margin-bottom: 16px;">🔍</div>
+                        <h3 style="font-size: 20px; color: #333; margin-bottom: 8px;">No results found</h3>
+                        <p style="color: #666;">Try a different search term or browse our categories.</p>
+                    </div>`;
+            } else {
+                grid.innerHTML = results.map((p, i) => {
+                    const grad = gradients[i % gradients.length];
+                    const shippingHtml = p.shipping
+                        ? '<div class="product-shipping">📦 Shipping available</div>'
+                        : '<div class="product-shipping person-only">👤 Only sold in person</div>';
+                    const badgeHtml = p.badge
+                        ? `<div class="product-badge${p.badge === 'Top profile' || p.badge === 'Featured' ? ' highlighted' : ''}">${p.badge}</div>`
+                        : '';
+
+                    return `
+                    <div class="product-card" data-product-id="${p.id}" data-product-name="${p.name}" data-product-category="${p.categoryLabel}" data-price="${p.price}" data-currency="EUR">
+                        ${badgeHtml}
+                        <div class="product-image" style="background: ${grad}; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">${p.icon}</div>
+                        <button class="product-favorite">♡</button>
+                        <div class="product-info">
+                            <div class="product-price">${formatPrice(p)}</div>
+                            <div class="product-title">${p.name}</div>
+                            <div style="font-size: 11px; color: #999; margin-bottom: 4px;">in ${p.categoryLabel}</div>
+                            ${shippingHtml}
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            renderFilters(null);
+            document.getElementById('filterSubcategories').style.display = 'none';
+            bindProductListeners();
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelector('.product-page-content').classList.add('active');
+
+            const searchBox = document.querySelector('.search-box');
+            searchBox.classList.add('product-search');
+
+            document.querySelectorAll('.category-nav a').forEach(a => a.classList.remove('active'));
+
+            window.scrollTo(0, 0);
+
+            trackEvent('[Amplitude] Page Viewed', {
+                '[Amplitude] Page Domain': window.location.hostname,
+                '[Amplitude] Page Location': window.location.href,
+                '[Amplitude] Page Path': '/search',
+                '[Amplitude] Page Title': 'Search: ' + query + ' - GGpop',
+                '[Amplitude] Page URL': window.location.href,
+                page_type: 'search_results',
+                search_term: query,
+                results_count: results.length
+            });
+        }
+
+        function navigateToCategory(categoryKey) {
+            currentSearchTerm = null;
+            renderProducts(categoryKey);
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelector('.product-page-content').classList.add('active');
+
+            const cat = categoryData[categoryKey];
+            const searchBox = document.querySelector('.search-box');
+            searchBox.placeholder = cat.label;
+            searchBox.value = cat.label;
+            searchBox.classList.add('product-search');
+
+            document.querySelectorAll('.category-nav a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('data-nav') === categoryKey) a.classList.add('active');
+            });
+
+            window.scrollTo(0, 0);
+
+            trackEvent('[Amplitude] Page Viewed', {
+                '[Amplitude] Page Domain': window.location.hostname,
+                '[Amplitude] Page Location': window.location.href,
+                '[Amplitude] Page Path': '/' + categoryKey,
+                '[Amplitude] Page Title': cat.label + ' - GGpop',
+                '[Amplitude] Page URL': window.location.href,
+                page_type: 'product_listing',
+                category: cat.label
+            });
+        }
+
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+
+            const targetPage = document.querySelector(`.${pageName}-content`);
+            if (targetPage) targetPage.classList.add('active');
+
+            const searchBox = document.querySelector('.search-box');
+            if (pageName === 'homepage') {
+                searchBox.placeholder = 'Search for Nintendo';
+                searchBox.value = '';
+                searchBox.classList.remove('product-search');
+                currentCategory = null;
+                document.querySelectorAll('.category-nav a').forEach(a => {
+                    a.classList.remove('active');
+                    if (a.getAttribute('data-nav') === 'all-categories') a.classList.add('active');
+                });
+            }
+
+            window.scrollTo(0, 0);
+
+            trackEvent('[Amplitude] Page Viewed', {
+                '[Amplitude] Page Domain': window.location.hostname,
+                '[Amplitude] Page Location': window.location.href,
+                '[Amplitude] Page Path': window.location.pathname,
+                '[Amplitude] Page Title': document.title,
+                '[Amplitude] Page URL': window.location.href,
+                page_type: pageName
+            });
+        }
+
+        // --- Amplitude ---
+        function initializeAmplitude() {
+            if (amplitudeInitialized) return;
+
+            window.amplitude.add(window.engagement.plugin());
+
+            window.amplitude.init('af266e62320cf461d86cb154929ae006', {
+                autocapture: {
+                    pageViews: false,
+                    sessions: true,
+                    elementInteractions: false,
+                    attribution: true
+                },
+                defaultTracking: {
+                    pageViews: false,
+                    sessions: true,
+                    formInteractions: false,
+                    attribution: true
+                }
+            });
+
+            amplitudeInitialized = true;
+            console.log('Amplitude initialized with consent');
+
+            trackEvent('[Amplitude] Page Viewed', {
+                '[Amplitude] Page Domain': window.location.hostname,
+                '[Amplitude] Page Location': window.location.href,
+                '[Amplitude] Page Path': window.location.pathname,
+                '[Amplitude] Page Title': document.title,
+                '[Amplitude] Page URL': window.location.href
+            });
+        }
+
+        function trackEvent(eventName, properties = {}) {
+            if (!amplitudeInitialized) {
+                console.log('Amplitude not initialized - event not tracked:', eventName);
+                return;
+            }
+            window.amplitude.track(eventName, properties);
+            console.log('Event tracked:', eventName, properties);
+        }
+
+        // --- Cookie consent ---
+        function acceptCookies() {
+            document.querySelector('.cookie-banner').classList.remove('visible');
+            document.body.classList.remove('consent-pending');
+            initializeAmplitude();
+            trackEvent('Cookie Consent Given', {
+                consent_type: 'accept_all',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function rejectCookies() {
+            document.querySelector('.cookie-banner').classList.remove('visible');
+            document.body.classList.remove('consent-pending');
+            console.log('Cookies rejected - No tracking will be initialized');
+            alert('You have rejected cookies. No tracking will be performed.');
+        }
+
+        function configureCookies() {
+            acceptCookies();
+        }
+
+        // --- Event wiring ---
+        function setupNavigationTracking() {
+            document.querySelectorAll('[data-nav]').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const navKey = this.getAttribute('data-nav');
+                    const buttonText = this.textContent.trim();
+
+                    trackEvent('Nav Menu Clicked', {
+                        button_name: navKey,
+                        button_text: buttonText,
+                        location: 'header'
+                    });
+
+                    if (navKey === 'logo' || navKey === 'all-categories') {
+                        showPage('homepage');
+                    } else if (categoryData[navKey]) {
+                        navigateToCategory(navKey);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.category-tile, .lifestyle-tile').forEach(tile => {
+                tile.addEventListener('click', function() {
+                    const categoryName = this.getAttribute('data-category');
+                    const tileType = this.classList.contains('category-tile') ? 'main_category' : 'lifestyle_category';
+
+                    trackEvent('Product Category Tile Clicked', {
+                        category_name: categoryName,
+                        tile_type: tileType,
+                        section: tileType === 'main_category' ? 'The technology you need' : 'Back to routine'
+                    });
+
+                    if (categoryData[categoryName]) {
+                        setTimeout(() => navigateToCategory(categoryName), 100);
+                    }
+                });
+            });
+
+            const searchBox = document.querySelector('.search-box');
+            if (searchBox) {
+                searchBox.addEventListener('focus', function() {
+                    trackEvent('Search Box Focused');
+                });
+                searchBox.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && this.value.trim()) {
+                        const term = this.value.trim();
+                        trackEvent('Search Performed', {
+                            search_term: term,
+                            search_location: 'header'
+                        });
+                        performSearch(term);
+                    }
+                });
+            }
+
+            document.querySelectorAll('.hero .btn-primary').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    trackEvent('Hero CTA Clicked', { button_text: this.textContent.trim(), section: 'hero' });
+                });
+            });
+
+            document.querySelectorAll('.footer a').forEach(link => {
+                link.addEventListener('click', function() {
+                    trackEvent('Footer Link Clicked', { link_text: this.textContent.trim(), section: 'footer' });
+                });
+            });
+
+            document.querySelectorAll('.app-store-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    trackEvent('App Store Link Clicked', { store_name: this.textContent.trim(), location: 'footer' });
+                });
+            });
+        }
+
+        function setupStaticListingListeners() {
+            document.querySelector('.change-location')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                trackEvent('Filter Applied', { filter_type: 'location', action: 'change_location_clicked' });
+            });
+
+            document.querySelector('.toggle')?.addEventListener('click', function() {
+                const isOn = this.style.transform === 'rotateY(180deg)';
+                this.style.transform = isOn ? '' : 'rotateY(180deg)';
+                trackEvent('Filter Applied', { filter_type: 'shipping', filter_value: isOn ? 'disabled' : 'enabled' });
+            });
+
+            document.querySelectorAll('input[name="listing_date"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    trackEvent('Filter Applied', { filter_type: 'listing_date', filter_value: this.value });
+                });
+            });
+
+            document.querySelectorAll('input[name="price_range"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    trackEvent('Filter Applied', { filter_type: 'price_range', filter_value: this.value, category: currentCategory });
+                });
+            });
+
+            document.querySelector('.sort-dropdown')?.addEventListener('click', function() {
+                trackEvent('Sort Options Clicked', { current_sort: 'distance', category: currentCategory });
+            });
+
+            document.querySelector('.btn-load-more')?.addEventListener('click', function() {
+                trackEvent('Load More Clicked', {
+                    page_type: 'product_listing',
+                    category: currentCategory ? categoryData[currentCategory]?.label : 'unknown'
+                });
+            });
+        }
+
+        function setupScrollTracking() {
+            let scrollDepths = [25, 50, 75, 100];
+            let trackedDepths = new Set();
+
+            window.addEventListener('scroll', function() {
+                const scrollPercent = Math.round((window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+                scrollDepths.forEach(depth => {
+                    if (scrollPercent >= depth && !trackedDepths.has(depth)) {
+                        trackedDepths.add(depth);
+                        trackEvent('Page Scroll Depth', { scroll_depth: depth, page_path: window.location.pathname });
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNavigationTracking();
+            setupScrollTracking();
+            setupStaticListingListeners();
+        });
+    </script>
+</body>
+</html>
