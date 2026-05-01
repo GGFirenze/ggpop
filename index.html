@@ -9,7 +9,7 @@
     <!-- Amplitude Browser SDK -->
     <script src="https://cdn.amplitude.com/libs/analytics-browser-2.42.0-min.js.gz"></script>
     <!-- Amplitude Guides & Surveys Plugin -->
-    <script src="https://cdn.amplitude.com/libs/engagement-browser-1.0.9-min.js.gz"></script>
+    <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.engagement.js"></script>
     
     <style>
         * {
@@ -1567,24 +1567,22 @@
         function initializeAmplitude() {
             if (amplitudeInitialized) return;
 
-            window.amplitude.add(window.engagement.plugin());
+            if (window.engagement && window.engagement.plugin) {
+                window.amplitude.add(window.engagement.plugin());
+            }
 
             window.amplitude.init('af266e62320cf461d86cb154929ae006', {
                 autocapture: {
                     pageViews: false,
-                    sessions: false,
+                    sessions: true,
                     elementInteractions: false,
-                    attribution: true,
-                    frustrationInteractions: true,
-                    webVitals: true
+                    attribution: true
                 },
                 defaultTracking: {
                     pageViews: false,
-                    sessions: false,
+                    sessions: true,
                     formInteractions: false,
-                    attribution: true,
-                    frustrationInteractions: true,
-                    webVitals: true
+                    attribution: true
                 }
             });
 
