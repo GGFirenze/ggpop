@@ -1575,7 +1575,16 @@
 
             window.amplitude.init('af266e62320cf461d86cb154929ae006', {
                 fetchRemoteConfig: true,
-                autocapture: true
+                autocapture: {
+                    attribution: true,
+                    pageViews: false,
+                    sessions: false,
+                    formInteractions: false,
+                    fileDownloads: false,
+                    elementInteractions: false,
+                    frustrationInteractions: true,
+                    webVitals: true
+                }
             });
 
             amplitudeInitialized = true;
