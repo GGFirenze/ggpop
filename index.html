@@ -6,9 +6,26 @@
     <title>GGpop - Buy and sell reused products</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
     
-    <!-- Amplitude: Analytics + Session Replay + Guides & Surveys -->
+    <!-- Amplitude Browser SDK -->
     <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.js"></script>
     <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.engagement.js"></script>
+    <script>
+        window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
+        window.amplitude.add(window.engagement.plugin());
+        window.amplitude.init('af266e62320cf461d86cb154929ae006', {
+            fetchRemoteConfig: true,
+            autocapture: {
+                attribution: true,
+                pageViews: false,
+                sessions: false,
+                formInteractions: false,
+                fileDownloads: false,
+                elementInteractions: false,
+                webVitals: true,
+                frustrationInteractions: true
+            }
+        });
+    </script>
     
     <style>
         * {
@@ -1008,7 +1025,6 @@
     </footer>
 
     <script>
-        let amplitudeInitialized = false;
         let currentCategory = null;
         let currentSearchTerm = null;
 
@@ -1426,46 +1442,8 @@
             });
         }
 
-        // --- Amplitude ---
-        function initializeAmplitude() {
-            if (amplitudeInitialized) return;
-
-            window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
-
-            if (window.engagement && window.engagement.plugin) {
-                window.amplitude.add(window.engagement.plugin());
-            }
-
-            window.amplitude.init('af266e62320cf461d86cb154929ae006', {
-                fetchRemoteConfig: true,
-                autocapture: {
-                    attribution: true,
-                    pageViews: false,
-                    sessions: false,
-                    formInteractions: false,
-                    fileDownloads: false,
-                    elementInteractions: false,
-                    frustrationInteractions: true,
-                    webVitals: true
-                }
-            });
-
-            amplitudeInitialized = true;
-            console.log('Amplitude initialized');
-
-            trackEvent('[Amplitude] Page Viewed', {
-                '[Amplitude] Page Domain': window.location.hostname,
-                '[Amplitude] Page Location': window.location.href,
-                '[Amplitude] Page Path': window.location.pathname,
-                '[Amplitude] Page Title': document.title,
-                '[Amplitude] Page URL': window.location.href
-            });
-        }
-
         function trackEvent(eventName, properties = {}) {
-            if (!amplitudeInitialized) return;
             window.amplitude.track(eventName, properties);
-            console.log('Event tracked:', eventName, properties);
         }
 
         // --- Event wiring ---
@@ -1595,7 +1573,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            initializeAmplitude();
             setupNavigationTracking();
             setupScrollTracking();
             setupStaticListingListeners();
