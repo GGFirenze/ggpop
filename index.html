@@ -6,9 +6,8 @@
     <title>GGpop - Buy and sell reused products</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
     
-    <!-- Amplitude Browser SDK -->
-    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.42.0-min.js.gz"></script>
-    <!-- Amplitude Guides & Surveys Plugin -->
+    <!-- Amplitude: Analytics + Session Replay + Guides & Surveys -->
+    <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.js"></script>
     <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.engagement.js"></script>
     
     <style>
@@ -1567,27 +1566,16 @@
         function initializeAmplitude() {
             if (amplitudeInitialized) return;
 
+            if (window.sessionReplay && window.sessionReplay.plugin) {
+                window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
+            }
             if (window.engagement && window.engagement.plugin) {
                 window.amplitude.add(window.engagement.plugin());
             }
 
             window.amplitude.init('af266e62320cf461d86cb154929ae006', {
-                autocapture: {
-                    pageViews: false,
-                    sessions: false,
-                    elementInteractions: false,
-                    attribution: true,
-                    frustrationInteractions: true,
-                    webVitals: true
-                },
-                defaultTracking: {
-                    pageViews: false,
-                    sessions: false,
-                    formInteractions: false,
-                    attribution: true,
-                    frustrationInteractions: true,
-                    webVitals: true
-                }
+                fetchRemoteConfig: true,
+                autocapture: true
             });
 
             amplitudeInitialized = true;
