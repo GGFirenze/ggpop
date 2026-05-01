@@ -7,8 +7,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
     
     <!-- Amplitude: Analytics + Session Replay + Guides & Surveys -->
-    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.42.0-min.js.gz"></script>
-    <script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.39.0-min.js.gz"></script>
+    <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.js"></script>
     <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.engagement.js"></script>
     
     <style>
@@ -23,12 +22,6 @@
             line-height: 1.6;
             color: #333;
             background-color: #f8f9fa;
-        }
-
-        /* Blur effect for cookie consent */
-        body.consent-pending .main-content {
-            filter: blur(3px);
-            pointer-events: none;
         }
 
         /* Header */
@@ -389,94 +382,6 @@
             font-size: 14px;
         }
 
-        /* Cookie Consent Banner */
-        .cookie-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
-            z-index: 200;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .cookie-banner.visible {
-            transform: translateY(0);
-        }
-
-        .cookie-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        .cookie-text h3 {
-            font-size: 20px;
-            margin-bottom: 12px;
-            color: #333;
-        }
-
-        .cookie-text p {
-            color: #666;
-            margin-bottom: 12px;
-            line-height: 1.6;
-        }
-
-        .cookie-links {
-            display: flex;
-            gap: 16px;
-            margin-top: 8px;
-        }
-
-        .cookie-links a {
-            color: #13c5a3;
-            text-decoration: none;
-        }
-
-        .data-processing h4 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #333;
-        }
-
-        .data-processing p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 12px;
-        }
-
-        .cookie-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .cookie-actions .btn {
-            flex: 1;
-        }
-
-        .btn-accept {
-            background: #13c5a3;
-            color: white;
-        }
-
-        .btn-reject {
-            background: transparent;
-            color: #666;
-            border: 1px solid #ddd;
-        }
-
-        .btn-configure {
-            background: transparent;
-            color: #666;
-            border: 1px solid #ddd;
-        }
-
         /* Product Listing Page Styles */
         .page {
             display: none;
@@ -805,11 +710,6 @@
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             }
 
-            .cookie-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
             .footer-links {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -831,7 +731,7 @@
         }
     </style>
 </head>
-<body class="consent-pending">
+<body>
     <!-- Header -->
     <header class="header">
         <nav class="top-nav">
@@ -1106,43 +1006,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- Cookie Consent Banner -->
-    <div class="cookie-banner visible">
-        <div class="cookie-content">
-            <div>
-                <div class="cookie-text">
-                    <h3>Privacy stuff? You choose</h3>
-                    <p>
-                        Here at GGpop, we and our <strong>941</strong> partners store and process cookies and your data to improve and keep all GGpop 
-                        services secure, adapt and measure advertising, content and communication. You may accept or manage your choices by 
-                        clicking below, including your right to object where legitimate interest is used, or at any time in the privacy policy page. 
-                        These choices will be signaled to our partners and will not affect browsing data.
-                    </p>
-                    <div class="cookie-links">
-                        <a href="#">Cookies policy</a>
-                        <a href="#">Privacy policy</a>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <div class="data-processing">
-                    <h4>What do we process data for?</h4>
-                    <p>
-                        Use precise geolocation data. Actively scan device characteristics for identification. Store and/or access 
-                        information on a device. Personalised advertising and content, advertising and content measurement, audience 
-                        research and services development.
-                    </p>
-                    <a href="#" style="color: #13c5a3; text-decoration: none;">List of Partners (vendors)</a>
-                </div>
-                <div class="cookie-actions">
-                    <button class="btn btn-accept" onclick="acceptCookies()">Accept all</button>
-                    <button class="btn btn-reject" onclick="rejectCookies()">Reject all</button>
-                    <button class="btn btn-configure" onclick="configureCookies()">Configure</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         let amplitudeInitialized = false;
@@ -1567,11 +1430,7 @@
         function initializeAmplitude() {
             if (amplitudeInitialized) return;
 
-            var sessionReplayTracking = window.sessionReplay.plugin({
-                sampleRate: 1,
-                forceSessionTracking: true
-            });
-            window.amplitude.add(sessionReplayTracking);
+            window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
 
             if (window.engagement && window.engagement.plugin) {
                 window.amplitude.add(window.engagement.plugin());
@@ -1592,7 +1451,7 @@
             });
 
             amplitudeInitialized = true;
-            console.log('Amplitude initialized with consent');
+            console.log('Amplitude initialized');
 
             trackEvent('[Amplitude] Page Viewed', {
                 '[Amplitude] Page Domain': window.location.hostname,
@@ -1604,34 +1463,9 @@
         }
 
         function trackEvent(eventName, properties = {}) {
-            if (!amplitudeInitialized) {
-                console.log('Amplitude not initialized - event not tracked:', eventName);
-                return;
-            }
+            if (!amplitudeInitialized) return;
             window.amplitude.track(eventName, properties);
             console.log('Event tracked:', eventName, properties);
-        }
-
-        // --- Cookie consent ---
-        function acceptCookies() {
-            document.querySelector('.cookie-banner').classList.remove('visible');
-            document.body.classList.remove('consent-pending');
-            initializeAmplitude();
-            trackEvent('Cookie Consent Given', {
-                consent_type: 'accept_all',
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        function rejectCookies() {
-            document.querySelector('.cookie-banner').classList.remove('visible');
-            document.body.classList.remove('consent-pending');
-            console.log('Cookies rejected - No tracking will be initialized');
-            alert('You have rejected cookies. No tracking will be performed.');
-        }
-
-        function configureCookies() {
-            acceptCookies();
         }
 
         // --- Event wiring ---
@@ -1761,6 +1595,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            initializeAmplitude();
             setupNavigationTracking();
             setupScrollTracking();
             setupStaticListingListeners();
