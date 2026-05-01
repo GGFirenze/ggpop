@@ -7,7 +7,8 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
     
     <!-- Amplitude: Analytics + Session Replay + Guides & Surveys -->
-    <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.js"></script>
+    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.12-min.js.gz"></script>
+    <script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.28.1-min.js.gz"></script>
     <script src="https://cdn.amplitude.com/script/af266e62320cf461d86cb154929ae006.engagement.js"></script>
     
     <style>
@@ -1566,9 +1567,12 @@
         function initializeAmplitude() {
             if (amplitudeInitialized) return;
 
-            if (window.sessionReplay && window.sessionReplay.plugin) {
-                window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
-            }
+            var sessionReplayTracking = window.sessionReplay.plugin({
+                sampleRate: 1,
+                forceSessionTracking: true
+            });
+            window.amplitude.add(sessionReplayTracking);
+
             if (window.engagement && window.engagement.plugin) {
                 window.amplitude.add(window.engagement.plugin());
             }
